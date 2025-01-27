@@ -3,16 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const AuthForm = () => {
-  const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
-  const [isAnimating, setIsAnimating] = useState(false); // Prevent button spam during animation
+  const [isLogin, setIsLogin] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Variants for diagonal divider rotation
+  // Updated clip path calculations for the specific diagonal split
+  const getClipPath = () => {
+    // Login state: line from top-left (50,0) to bottom-right (70,100)
+    // Signup state: inverse of login state
+    return isLogin 
+      ? "polygon(50% 0%, 100% 0%, 100% 100%, 70% 100%)"
+      : "polygon(0% 0%, 50% 0%, 70% 100%, 0% 100%)";
+  };
+
+  // Variants for smooth circular rotation
   const variants = {
     initial: {
-      rotate: isLogin ? 0 : 180, // Initial rotation
+      rotate: isLogin ? 0 : 180,
+      scale: 1.2, // Slightly larger to ensure coverage during rotation
     },
     animate: {
-      rotate: isLogin ? 180 : 0, // Rotate clockwise or counter-clockwise
+      rotate: isLogin ? 180 : 0,
       transition: {
         duration: 0.8,
         ease: [0.4, 0, 0.2, 1],
@@ -20,13 +30,25 @@ const AuthForm = () => {
     },
   };
 
-  // Symmetrical clip paths for diagonal division
-  const getClipPath = () => isLogin ? "polygon(30% 0, 80% 100%, 30% 100%, 0 100%)": "polygon(100% 0, 100% 30%, 100% 80%, 0 30%)";
-  
+  // Background transition variants
+  const backgroundVariants = {
+    initial: { backgroundColor: "#000" },
+    animate: { backgroundColor: "#7C3AED" }, // Tailwind purple-600
+    exit: { backgroundColor: "#000" },
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900">
       <div className="relative h-[500px] w-[800px] overflow-hidden rounded-lg shadow-lg">
-        {/* Diagonal Divider with inverse rotation */}
+        {/* Background color transition layer */}
+        <motion.div
+          className="absolute inset-0 z-10"
+          variants={backgroundVariants}
+          initial="initial"
+          animate={isAnimating ? "animate" : "initial"}
+        />
+
+        {/* Diagonal Divider */}
         <motion.div
           className="absolute inset-0 z-20 h-[150%] w-[150%] origin-center bg-purple-600"
           style={{ clipPath: getClipPath() }}
@@ -40,7 +62,7 @@ const AuthForm = () => {
         {/* Main Container */}
         <div className="absolute inset-0 flex">
           <AnimatePresence mode="wait">
-            {/* Welcome Text - Perfect mirror positioning */}
+            {/* Welcome Text */}
             <motion.div
               key={isLogin ? "welcome-back" : "welcome"}
               className={`absolute flex h-full w-1/2 items-center justify-center p-12 ${
@@ -57,7 +79,7 @@ const AuthForm = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Form Container - Mirror animation */}
+          {/* Form Container */}
           <motion.div
             className={`absolute flex h-full w-1/2 items-center justify-center bg-black p-12 ${
               isLogin ? "left-0" : "right-0"
@@ -96,7 +118,7 @@ const AuthForm = () => {
           </motion.div>
         </div>
 
-        {/* Symmetrical Toggle Links */}
+        {/* Toggle Links */}
         <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-6">
           <button
             className={`text-white hover:underline ${
