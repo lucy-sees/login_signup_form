@@ -23,5 +23,23 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  
+  "content": "['./src/**/*.{js,jsx,ts,tsx}']",
+  "theme": {
+    "extend": {
+      "aspectRatio": {
+        '4/5': '4 / 5',
+      },
+      "colors": {
+        "zinc": {
+          800: '#27272a',
+          500: '#52525b',
+        },
+      },
+    },
+  },
+  "plugins": [
+    require('@tailwindcss/aspect-ratio'),
+  ],
 }
